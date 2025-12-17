@@ -42,7 +42,9 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  phone: { type: String },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  isActive: { type: Boolean, default: true },
   status: { type: String, enum: ['active', 'inactive'], default: 'active' }
 }, { timestamps: true });
 
@@ -276,7 +278,8 @@ app.put('/api/users/:id/toggle-status', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    user.status = user.status === 'active' ? 'inactive' : 'active';
+    user.isActive = !user.isActive;
+    user.status = user.isActive ? 'active' : 'inactive';
     await user.save();
     res.json({ message: 'User status updated', user });
   } catch (error) {
