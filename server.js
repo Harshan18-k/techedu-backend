@@ -182,7 +182,37 @@ app.post('/api/admissions', async (req, res) => {
   }
 });
 
+app.post('/api/admissions/simple', async (req, res) => {
+  try {
+    const { fullName, email, phone, course, message } = req.body;
+    
+    const applicationNumber = 'APP' + Date.now();
+    const admission = new Admission({
+      applicationNumber,
+      fullName,
+      email,
+      phone,
+      course,
+      message
+    });
+    
+    await admission.save();
+    res.status(201).json({ message: 'Application submitted successfully', admission });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 app.get('/api/admissions', authenticateToken, async (req, res) => {
+  try {
+    const admissions = await Admission.find().sort({ createdAt: -1 });
+    res.json({ admissions });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/api/admissions/all', async (req, res) => {
   try {
     const admissions = await Admission.find().sort({ createdAt: -1 });
     res.json({ admissions });
