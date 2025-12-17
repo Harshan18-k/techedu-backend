@@ -184,6 +184,28 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ user });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+});
+
 // Contact Routes
 app.post('/api/contact', async (req, res) => {
   try {
@@ -413,6 +435,28 @@ mongoose.connect(process.env.MONGO_URL)
     console.log('Database:', mongoose.connection.db.databaseName);
   })
   .catch(err => console.error('❌ MongoDB connection error:', err));
+
+// Catch-all route for debugging
+app.use('/api/*', (req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    message: 'API route not found', 
+    method: req.method, 
+    url: req.originalUrl,
+    availableRoutes: [
+      'GET /api/test',
+      'GET /api/debug/users',
+      'GET /api/debug/contacts', 
+      'GET /api/debug/admissions',
+      'GET /api/users',
+      'GET /api/admin/contacts',
+      'GET /api/admin/admissions',
+      'POST /api/auth/login',
+      'POST /api/auth/register',
+      'GET /api/auth/me'
+    ]
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
