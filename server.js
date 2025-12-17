@@ -235,7 +235,100 @@ app.get('/api/admissions/all', async (req, res) => {
   }
 });
 
+// User Routes
+app.get('/api/users', authenticateToken, async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json({ users });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.put('/api/users/:id/toggle-status', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    user.status = user.status === 'active' ? 'inactive' : 'active';
+    await user.save();
+    res.json({ message: 'User status updated', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.delete('/api/users/:id', authenticateToken, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Admin Routes
+app.get('/api/admin/stats', authenticateToken, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalContacts = await Contact.countDocuments();
+    const totalAdmissions = await Admission.countDocuments();
+    const pendingAdmissions = await Admission.countDocuments({ status: 'pending' });
+    
+    res.json({
+      totalUsers,
+      totalContacts,
+      totalAdmissions,
+      pendingAdmissions
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/api/admin/contacts', authenticateToken, async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.json({ contacts });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/api/admin/admissions', authenticateToken, async (req, res) => {
+  try {
+    const admissions = await Admission.find().sort({ createdAt: -1 });
+    res.json({ admissions });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.put('/api/admin/contacts/:id', authenticateToken, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    res.json({ message: 'Contact status updated', contact });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.delete('/api/admin/contacts/:id', authenticateToken, async (req, res) => {
+  try {
+    await Contact.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Contact deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 app.post('/api/admin/create-admin', async (req, res) => {
   try {
     const adminExists = await User.findOne({ role: 'admin' });
