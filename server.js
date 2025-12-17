@@ -67,9 +67,9 @@ const admissionSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' }
 }, { timestamps: true });
 
-const User = mongoose.model('User', userSchema);
-const Contact = mongoose.model('Contact', contactSchema);
-const Admission = mongoose.model('Admission', admissionSchema);
+const User = mongoose.model('User', userSchema, 'users');
+const Contact = mongoose.model('Contact', contactSchema, 'contacts');
+const SimpleAdmission = mongoose.model('SimpleAdmission', admissionSchema, 'simpleadmissions');
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
@@ -117,7 +117,7 @@ app.get('/api/debug/contacts', async (req, res) => {
 
 app.get('/api/debug/admissions', async (req, res) => {
   try {
-    const admissions = await Admission.find().sort({ createdAt: -1 });
+    const admissions = await SimpleAdmission.find().sort({ createdAt: -1 });
     res.json({ admissions, count: admissions.length });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -211,7 +211,7 @@ app.post('/api/admissions', async (req, res) => {
     const { fullName, email, phone, course, message } = req.body;
     
     const applicationNumber = 'APP' + Date.now();
-    const admission = new Admission({
+    const admission = new SimpleAdmission({
       applicationNumber,
       fullName,
       email,
@@ -232,7 +232,7 @@ app.post('/api/admissions/simple', async (req, res) => {
     const { fullName, email, phone, course, message } = req.body;
     
     const applicationNumber = 'APP' + Date.now();
-    const admission = new Admission({
+    const admission = new SimpleAdmission({
       applicationNumber,
       fullName,
       email,
@@ -248,9 +248,9 @@ app.post('/api/admissions/simple', async (req, res) => {
   }
 });
 
-app.get('/api/admissions', authenticateToken, async (req, res) => {
+app.get('/api/admissions', async (req, res) => {
   try {
-    const admissions = await Admission.find().sort({ createdAt: -1 });
+    const admissions = await SimpleAdmission.find().sort({ createdAt: -1 });
     res.json({ admissions });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -259,17 +259,17 @@ app.get('/api/admissions', authenticateToken, async (req, res) => {
 
 app.get('/api/admissions/all', async (req, res) => {
   try {
-    const admissions = await Admission.find().sort({ createdAt: -1 });
+    const admissions = await SimpleAdmission.find().sort({ createdAt: -1 });
     res.json({ admissions });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-app.put('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
+app.put('/api/admin/admissions/:id', async (req, res) => {
   try {
     const { status } = req.body;
-    const admission = await Admission.findByIdAndUpdate(
+    const admission = await SimpleAdmission.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
@@ -280,9 +280,9 @@ app.put('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
   }
 });
 
-app.delete('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
+app.delete('/api/admin/admissions/:id', async (req, res) => {
   try {
-    await Admission.findByIdAndDelete(req.params.id);
+    await SimpleAdmission.findByIdAndDelete(req.params.id);
     res.json({ message: 'Admission deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -325,12 +325,12 @@ app.delete('/api/users/:id', authenticateToken, async (req, res) => {
 });
 
 // Admin Routes
-app.get('/api/admin/stats', authenticateToken, async (req, res) => {
+app.get('/api/admin/stats', async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalContacts = await Contact.countDocuments();
-    const totalAdmissions = await Admission.countDocuments();
-    const pendingAdmissions = await Admission.countDocuments({ status: 'pending' });
+    const totalAdmissions = await SimpleAdmission.countDocuments();
+    const pendingAdmissions = await SimpleAdmission.countDocuments({ status: 'pending' });
     
     res.json({
       totalUsers,
@@ -354,7 +354,7 @@ app.get('/api/admin/contacts', async (req, res) => {
 
 app.get('/api/admin/admissions', async (req, res) => {
   try {
-    const admissions = await Admission.find().sort({ createdAt: -1 });
+    const admissions = await SimpleAdmission.find().sort({ createdAt: -1 });
     res.json({ admissions });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
