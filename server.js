@@ -11,11 +11,14 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://techedu-frontend.onrender.com'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://techedu-frontend.onrender.com', 'https://zippy-dragon-057fae.netlify.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
