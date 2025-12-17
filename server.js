@@ -11,10 +11,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://techedu-frontend.onrender.com', 'https://zippy-dragon-057fae.netlify.app'],
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Handle preflight requests
@@ -71,6 +71,10 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'TechEdu Backend API is running!', status: 'OK' });
+});
+
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is working!' });
 });
