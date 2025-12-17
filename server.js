@@ -96,6 +96,34 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is working!' });
 });
 
+// Debug endpoints (no auth required)
+app.get('/api/debug/users', async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json({ users, count: users.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/api/debug/contacts', async (req, res) => {
+  try {
+    const contacts = await Contact.find().sort({ createdAt: -1 });
+    res.json({ contacts, count: contacts.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.get('/api/debug/admissions', async (req, res) => {
+  try {
+    const admissions = await Admission.find().sort({ createdAt: -1 });
+    res.json({ admissions, count: admissions.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Auth Routes
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -262,7 +290,7 @@ app.delete('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
 });
 
 // User Routes
-app.get('/api/users', authenticateToken, async (req, res) => {
+app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     res.json({ users });
@@ -315,7 +343,7 @@ app.get('/api/admin/stats', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/admin/contacts', authenticateToken, async (req, res) => {
+app.get('/api/admin/contacts', async (req, res) => {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });
     res.json({ contacts });
@@ -324,7 +352,7 @@ app.get('/api/admin/contacts', authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/api/admin/admissions', authenticateToken, async (req, res) => {
+app.get('/api/admin/admissions', async (req, res) => {
   try {
     const admissions = await Admission.find().sort({ createdAt: -1 });
     res.json({ admissions });
