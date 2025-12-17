@@ -1,31 +1,30 @@
 const express = require('express');
-const mongoose = requi<mark marker-index=8 reference-tracker>re('mongoose');
-c=10 reference-tracker>onst co=12 reference-tracker>rs = re=14 reference-tracker>quire('=16 reference-tracker>cors');=18 reference-tracker>
-const =20 reference-tracker>dotenv =22 reference-tracker>= requi=24 reference-tracker>re('dot=26 reference-tracker>env');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 dotenv.config();
-
 const app = express();
 
 app.use(cors({
   origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  a</mark></mark></mark>llowedHeaders: ['Conacker>tent-Type', 'Authorizatence-tracker>ion', 'X-Reques/mark>-tracker>racker>er>rence-tracker>ted-Wittracker>h']
-}));
+  allowedHeaders: ['Content-Type', 'Au<mark marker-index=8 reference-tracker>thorization', 'X-=10 reference-tracker>Request=12 reference-tracker>ed-With=14 reference-tracker>']
+}));=16 reference-tracker>
 
-app.>use(exp-index=4</mark>5 reference-tracker>ress.jsce-tker-er>index=56 reference-tracker>racker>ex=48 reference-tracker>on());
+app.u=18 reference-tracker>se(expr=20 reference-tracker>ess.jso=22 reference-tracker>n());
 app.use(express.urlencoded({ extended: true }));
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, r</mark>equired: true },
-  phone: { type: String, required: true },
-  r</mark>ole: { type: String, default: 'user' }
-}, { timestamps: true });
+  password: { type: String, required: true },
+  phon</mnce-tracker>ark></mark></mar</mark>k>e: { type: String, required: true },
+  role: { typemarker-indr-index=58 reference-tracker>ex=45 reference-tracker>ex=26 reference-tracker>: Strinker>r-index=29 reference-tracker>g, def>ar-index=32 reference-tracker>ult: 'user' }
+r>},=47 reference-tracker> </mark<mark</mark> marker-index=50 reference-tracker>>{ ti<mark mararker-index=56 reference-tracker>ker-index=41 reference-tracker>mestamps: true });
 
 const User = mongoose.model('User', userSchema);
 
@@ -149,10 +148,10 @@ app.get('/api/admissions/all', async (req, res) => {
 });
 
 mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch(err => console.error('❌ MongoDB Error:', err));
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.error('MongoDB Error:', err));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
