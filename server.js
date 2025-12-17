@@ -236,6 +236,29 @@ app.get('/api/admissions/all', async (req, res) => {
   }
 });
 
+app.put('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const admission = await Admission.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    res.json({ message: 'Admission status updated', admission });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+app.delete('/api/admin/admissions/:id', authenticateToken, async (req, res) => {
+  try {
+    await Admission.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Admission deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // User Routes
 app.get('/api/users', authenticateToken, async (req, res) => {
   try {
